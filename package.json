@@ -27,7 +27,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test test/",
+    "prepublishOnly": "npm test",
+    "postpublish": "git push origin main --follow-tags"
   },
   "engines": {
     "node": ">=18"
