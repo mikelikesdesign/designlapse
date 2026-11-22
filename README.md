@@ -52,6 +52,7 @@ press **Copy**, and paste it into the chat. The agent saves the changed design a
 | `designlapse add <final.html> --title "…" [--prompt "…"] [--frame phone\|tablet\|browser\|none] [--url …] [--name slug] [--force]` | add a design; its `data-step` pieces become the steps |
 | `designlapse iterate <name> <step.html> [--from <step>]` | add a step, continuing or branching from a step |
 | `designlapse build [--name <design>]` | rebuild the page |
+| `designlapse dev [--port 4321]` | serve the page and reload it whenever a design changes |
 | `designlapse list` | list designs and their step files |
 | `designlapse instructions` | print the agent guide |
 

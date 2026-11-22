@@ -88,3 +88,28 @@ test('CLI: add, iterate, list, errors', () => {
   assert.throws(() => run('iterate', 'nope', 'final.html'), /No design named "nope"/);
   assert.match(run('instructions'), /# Designlapse — instructions for AI agents/);
 });
+
+test('dev server serves the page with live reload and rebuilds on change', async () => {
+  const { dev } = await import('../src/index.js');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'designlapse-dev-'));
+  const final = path.join(dir, 'final.html');
+  fs.writeFileSync(final, DOC);
+  const designs = path.join(dir, 'designs');
+  add(final, { dir: designs, title: 'Profile' });
+  const logs = [];
+  const d = dev({ dir: designs, port: 0, log: m => logs.push(m) });
+  await new Promise(r => d.server.once('listening', r));
+  const base = `http://127.0.0.1:${d.server.address().port}`;
+  try {
+    const page = await (await fetch(base + '/')).text();
+    assert.match(page, /new EventSource\('\/__designlapse\/events'\)/);
+    assert.ok(page.lastIndexOf('EventSource') > page.indexOf('id="flow-data"'), 'reload script goes at the end');
+    assert.equal((await fetch(base + '/profile/01.html')).status, 200);
+    assert.equal((await fetch(base + '/../../etc/passwd')).status, 404);
+    fs.appendFileSync(path.join(designs, 'profile', '02.html'), '\n');
+    await new Promise(r => setTimeout(r, 600));
+    assert.ok(logs.some(l => l.startsWith('rebuilt')), 'rebuilds after a change');
+  } finally {
+    d.close();
+  }
+});

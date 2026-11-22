@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { add, iterate, build, list, FRAMES } from '../src/project.js';
+import { dev } from '../src/dev.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const HELP = `designlapse — scrub through a design step by step
@@ -23,6 +24,7 @@ Usage
                                                that step (a branch if it isn't the latest one).
 
   designlapse build                            Rebuild the page from every design in the folder
+  designlapse dev [--port 4321]                Serve the page and reload it whenever a design changes
   designlapse list                             List designs and their steps
   designlapse instructions                     Print the guide for AI agents (AGENTS.md)
 
@@ -47,8 +49,8 @@ function parse(argv) {
   return { args, opts };
 }
 
-function openInBrowser(file) {
-  const target = path.resolve(file);
+function openInBrowser(file, isUrl = false) {
+  const target = isUrl ? file : path.resolve(file);
   const [cmd, ...pre] = process.platform === 'darwin' ? ['open'] : process.platform === 'win32' ? ['cmd', '/c', 'start', ''] : ['xdg-open'];
   try { spawn(cmd, [...pre, target], { stdio: 'ignore', detached: true }).unref(); } catch { /* the path is printed anyway */ }
 }
@@ -63,7 +65,7 @@ function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   const { args, opts } = parse(rest);
   const dir = opts.dir || 'designs';
-  if (!cmd || cmd === 'help' || opts.help) return console.log(HELP);
+  if (!cmd || ['help', '--help', '-h'].includes(cmd) || opts.help) return console.log(HELP);
 
   if (cmd === 'add') {
     if (!args[0]) throw new Error('Usage: designlapse add <final.html> --title "…" [--prompt "…"] [--frame phone]');
@@ -84,6 +86,13 @@ function main() {
     const b = build({ dir, current: opts.name });
     report(b);
     if (opts.open) openInBrowser(b.file);
+  } else if (cmd === 'dev') {
+    const port = opts.port === undefined ? 4321 : Number(opts.port);
+    if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('--port must be a number');
+    const d = dev({ dir, port, current: opts.name });
+    d.server.on('error', e => { console.error(`designlapse: ${e.code === 'EADDRINUSE' ? `port ${port} is in use, try --port ${port + 1}` : e.message}`); process.exit(1); });
+    if (opts.open) d.server.on('listening', () => openInBrowser(`http://localhost:${d.server.address().port}`, true));
+    process.on('SIGINT', () => { d.close(); process.exit(0); });
   } else if (cmd === 'list') {
     const ds = list({ dir });
     if (!ds.length) return console.log(`No designs in ${dir} yet.`);
