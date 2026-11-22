@@ -83,3 +83,18 @@ add('final.html', { title: 'User profile', frame: 'phone' });
 iterate('user-profile', 'changed.html', { from: '7' });
 build();
 ```
+
+## Developing
+
+The page is a React app built with [shadcn/ui](https://ui.shadcn.com) (MIT), Tailwind CSS and Vite, in `viewer/`.
+It compiles to one self-contained file, `template/page.html`, which is what the package ships — so installing
+designlapse pulls in no dependencies.
+
+```bash
+npm run setup     # install the viewer's dev dependencies (once)
+npm run build     # build template/page.html
+npm run watch     # rebuild on every change; pair with `designlapse dev` for live reload
+npm test
+```
+
+`npm publish` builds and tests first, then pushes to GitHub after publishing.

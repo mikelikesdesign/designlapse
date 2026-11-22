@@ -103,7 +103,10 @@ export function build({ dir = 'designs', current } = {}) {
   if (!designs.length) throw new Error(`No designs in ${rel(dir)} yet. Add one with \`designlapse add final.html --title "…"\`.`);
   const open = designs.find(d => d.slug === current) ? current : designs[designs.length - 1].slug;
   const payload = JSON.stringify({ designs, current: open }).replace(/<\//g, '<\\/');
-  const page = fs.readFileSync(TEMPLATE, 'utf8').replace('__FLOW_TITLE__', 'Designlapse').replace('__FLOW_DATA__', () => payload);
+  const SLOT = '<script id="flow-data" type="application/json">__FLOW_DATA__</script>';
+  const template = fs.readFileSync(TEMPLATE, 'utf8');
+  if (!template.includes(SLOT)) throw new Error('The page template is missing its data slot. Rebuild it with `npm run build`.');
+  const page = template.replace('<title>__FLOW_TITLE__</title>', '<title>Designlapse</title>').replace(SLOT, () => SLOT.replace('__FLOW_DATA__', payload));
   const out = path.join(dir, PAGE);
   fs.writeFileSync(out, page);
   return { file: out, designs: designs.map(d => ({ name: d.slug, steps: d.steps.length })), current: open, warnings };

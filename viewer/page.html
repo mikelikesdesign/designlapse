@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>__FLOW_TITLE__</title>
+    <script>
+      (function () {
+        var m = window.matchMedia('(prefers-color-scheme: dark)');
+        var set = function () { document.documentElement.classList.toggle('dark', m.matches); };
+        set();
+        m.addEventListener('change', set);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script id="flow-data" type="application/json">__FLOW_DATA__</script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

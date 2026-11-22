@@ -28,8 +28,11 @@
   ],
   "scripts": {
     "test": "node --test test/",
-    "prepublishOnly": "npm test",
-    "postpublish": "git push origin main --follow-tags"
+    "prepublishOnly": "npm run build && npm test",
+    "postpublish": "git push origin main --follow-tags",
+    "build": "npm --prefix viewer run build",
+    "setup": "npm --prefix viewer install",
+    "watch": "npm --prefix viewer run watch"
   },
   "engines": {
     "node": ">=18"
