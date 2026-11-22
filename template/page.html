@@ -26,18 +26,15 @@ body{background:var(--bg);color:var(--ink);font:14px/1.45 "Inter",ui-sans-serif,
 button,textarea{font:inherit;color:inherit}
 
 /* header */
-.top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6}
-.brand{flex:1;min-width:0;position:relative}
-.eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.picker{display:flex;align-items:center;gap:6px;max-width:100%;margin:1px -6px 0;padding:2px 6px;border:0;border-radius:8px;background:transparent;font-size:17px;font-weight:650;letter-spacing:-.01em;cursor:pointer;text-align:left}
-.picker:hover{background:var(--panel2)}
+.top{display:grid;grid-template-columns:1fr minmax(0,auto) 1fr;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6}
+.logo{justify-self:start;font-size:16px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.brand{justify-self:center;min-width:0;max-width:100%;position:relative}
+.top-r{justify-self:end;display:flex;gap:8px}
+.picker{display:flex;align-items:center;gap:8px;max-width:100%;padding:7px 10px 7px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:14px;font-weight:600;letter-spacing:-.005em;cursor:pointer;text-align:left}
+.picker:hover,.picker[aria-expanded="true"]{border-color:var(--muted)}
 .picker #title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.picker .ask{color:var(--muted);font-weight:450}
 .picker svg{flex:none;width:14px;height:14px;color:var(--muted)}
-.picker.single{cursor:default}
-.picker.single:hover{background:transparent}
-.picker.single svg{display:none}
-.menu{position:absolute;left:-6px;top:calc(100% + 6px);width:min(460px,calc(100vw - 24px));max-height:60vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.16);padding:6px;z-index:80}
+.menu{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 6px);width:min(460px,calc(100vw - 24px));max-height:60vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.16);padding:6px;z-index:80}
 .menu[hidden]{display:none}
 .menu-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 10px 6px}
 .mi{display:flex;gap:10px;align-items:flex-start;width:100%;border:0;background:transparent;text-align:left;padding:9px 10px;border-radius:10px;cursor:pointer}
@@ -47,7 +44,6 @@ button,textarea{font:inherit;color:inherit}
 .mi .tx{flex:1;min-width:0}
 .mi b{display:block;font-size:14px;font-weight:650}
 .mi .tx span{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mi .cnt{flex:none;font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
 .btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:550;cursor:pointer;white-space:nowrap}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
@@ -144,7 +140,7 @@ body.v-full #viewer{position:fixed;inset:0;width:auto;border:0;z-index:60}
 
 @media (max-width:720px){
   .top{padding:10px 14px}
-  .picker .ask{display:none}
+  .logo{font-size:15px}
   .btn .lbl{display:none}
   #viewer{position:fixed;inset:0;width:auto;border:0;z-index:60}
   #vFull{display:none}
@@ -157,14 +153,14 @@ body.v-full #viewer{position:fixed;inset:0;width:auto;border:0;z-index:60}
 </head>
 <body>
 <header class="top">
+  <div class="logo">Designlapse</div>
   <div class="brand">
-    <div class="eyebrow" id="eyebrow">Designlapse</div>
     <button class="picker" id="picker" aria-haspopup="listbox" aria-expanded="false" title="Switch design"><span id="title"></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></button>
     <div class="menu" id="menu" role="listbox" aria-label="Designs" hidden></div>
   </div>
-  <button class="btn" id="viewerBtn" title="Show or hide the lapse (L)">
+  <div class="top-r"><button class="btn" id="viewerBtn" title="Show or hide the lapse (L)">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M9.5 2.5v11"/></svg><span class="lbl">Lapse</span>
-  </button>
+  </button></div>
 </header>
 <main>
   <div id="stagewrap">
@@ -240,11 +236,8 @@ function pathThrough(s){
 }
 
 function header(){
-  const nb = STEPS.filter(isBranch).length;
   document.title = (DATA.title ? DATA.title + ' — ' : '') + 'Designlapse';
-  $('#title').innerHTML = `${esc(DATA.title || DATA.slug)}${DATA.prompt ? ` <span class="ask">— “${esc(DATA.prompt)}”</span>` : ''}`;
-  $('#eyebrow').textContent = `Designlapse · ${DESIGNS.length > 1 ? DESIGNS.length + ' designs · ' : ''}${N} step${N===1?'':'s'}${nb ? ` · ${nb} branch${nb===1?'':'es'}` : ''}`;
-  $('#picker').classList.toggle('single', DESIGNS.length < 2);
+  $('#title').textContent = DATA.title || DATA.slug;
   buildMenu();
 }
 
@@ -514,10 +507,10 @@ const menu = $('#menu'), picker = $('#picker');
 const CHECK = '<svg class="ck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3.5 8.5 3 3 6-7"/></svg>';
 function buildMenu(){
   menu.innerHTML = '<div class="menu-h">Designs in this project</div>' + DESIGNS.slice().reverse().map(d =>
-    `<button class="mi ${d === DATA ? 'on' : ''}" role="option" aria-selected="${d === DATA}" data-slug="${esc(d.slug)}">${CHECK}<span class="tx"><b>${esc(d.title || d.slug)}</b>${d.prompt ? `<span>“${esc(d.prompt)}”</span>` : ''}</span><span class="cnt">${d.steps.length} step${d.steps.length === 1 ? '' : 's'}</span></button>`).join('');
+    `<button class="mi ${d === DATA ? 'on' : ''}" role="option" aria-selected="${d === DATA}" data-slug="${esc(d.slug)}">${CHECK}<span class="tx"><b>${esc(d.title || d.slug)}</b>${d.prompt ? `<span>“${esc(d.prompt)}”</span>` : ''}</span></button>`).join('');
   menu.querySelectorAll('.mi').forEach(b => b.onclick = () => { closeMenu(); if (b.dataset.slug !== DATA.slug) load(b.dataset.slug); });
 }
-function openMenu(){ if (DESIGNS.length < 2) return; menu.hidden = false; picker.setAttribute('aria-expanded', 'true'); (menu.querySelector('.mi.on') || menu.querySelector('.mi'))?.focus(); }
+function openMenu(){ menu.hidden = false; picker.setAttribute('aria-expanded', 'true'); (menu.querySelector('.mi.on') || menu.querySelector('.mi'))?.focus(); }
 function closeMenu(){ menu.hidden = true; picker.setAttribute('aria-expanded', 'false'); }
 picker.onclick = e => { e.stopPropagation(); menu.hidden ? openMenu() : closeMenu(); };
 document.addEventListener('pointerdown', e => { if (!menu.hidden && !menu.contains(e.target) && !picker.contains(e.target)) closeMenu(); });
