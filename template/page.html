@@ -126,14 +126,12 @@ body.v-full #viewer{position:fixed;inset:0;width:auto;border:0;z-index:60}
 .v-foot{border-top:1px solid var(--line);padding:10px 14px 6px}
 .v-ctl{display:flex;align-items:center;gap:6px}
 .v-count{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.track{position:relative;height:40px;margin-top:4px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+.track{position:relative;height:32px;margin-top:4px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
 .tin{position:absolute;left:12px;right:12px;top:0;bottom:0}
 .rl{position:absolute;left:0;right:0;top:15px;height:3px;border-radius:3px;background:var(--line)}
 .fl{position:absolute;left:0;top:15px;height:3px;border-radius:3px;background:var(--ink);transition:width .2s}
 .tk{position:absolute;top:11px;width:2px;height:11px;margin-left:-1px;border-radius:2px;background:var(--edge)}
 .tk.done{background:var(--ink)}
-.tl{position:absolute;top:27px;transform:translateX(-50%);font-size:10px;color:var(--muted);font-weight:650;font-variant-numeric:tabular-nums}
-.tl.on{color:var(--ink)}
 .hd{position:absolute;top:7px;width:19px;height:19px;margin-left:-9.5px;border-radius:50%;background:var(--panel);border:2px solid var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.18);transition:left .2s}
 .track.drag .hd,.track.drag .fl{transition:none}
 .tip{position:absolute;bottom:100%;margin-bottom:4px;transform:translateX(-50%);background:var(--ink);color:var(--panel);font-size:12px;font-weight:550;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;max-width:260px;overflow:hidden;text-overflow:ellipsis}
@@ -375,11 +373,9 @@ $('#zfit').onclick = () => fitBox(bounds, true);
 const vBody = $('#vBody'), tin = $('#tin'), track = $('#track');
 const pct = i => V.path.length > 1 ? i/(V.path.length-1)*100 : 50;
 function buildTrack(){
-  const L = V.path.length, every = L <= 24 ? 1 : 5;
   let h = '<div class="rl"></div><div class="fl" id="fl"></div>';
   V.path.forEach((s,i) => {
     h += `<i class="tk" style="left:${pct(i)}%"></i>`;
-    if (i % every === 0 || i === L-1) h += `<span class="tl" data-i="${i}" style="left:${pct(i)}%">${esc(s.id)}</span>`;
   });
   tin.innerHTML = h + '<div class="hd" id="hd"></div><div class="tip" id="tip"></div>';
 }
@@ -409,7 +405,6 @@ function syncMarks(){
   $('#fl').style.width = pct(V.pi)+'%';
   $('#hd').style.left = pct(V.pi)+'%';
   tin.querySelectorAll('.tk').forEach((t,i) => t.classList.toggle('done', i <= V.pi));
-  tin.querySelectorAll('.tl').forEach(t => t.classList.toggle('on', +t.dataset.i === V.pi));
   $('#vCount').textContent = V.path.length ? `${V.pi+1} / ${V.path.length}` : '';
   $('#vPrev').disabled = V.pi === 0; $('#vNext').disabled = V.pi >= V.path.length-1;
   layer.querySelectorAll('.ab').forEach(a => { a.classList.toggle('on', a.dataset.id === V.cur.id); a.classList.toggle('path', V.path.some(s => s.id === a.dataset.id)); });
