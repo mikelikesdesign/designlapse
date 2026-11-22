@@ -1,6 +1,6 @@
 {
   "name": "designlapse",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scrub through a design step by step. Give it a finished HTML design with its pieces tagged in build order, and it builds a page where you can swipe from the first piece to the final screen, branch from any step, and copy a reference to paste into any AI chat.",
   "author": "mikelikesdesign",
   "repository": {
