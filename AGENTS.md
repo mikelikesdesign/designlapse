@@ -75,3 +75,4 @@ on its own row under step 7. Never edit or delete existing step files. Tell the 
 `designs/designlapse.html#user-profile/step-13` opens it.
 
 `npx designlapse list` shows every design and step; `npx designlapse build` rebuilds the page.
+`npx designlapse dev` serves the page at http://localhost:4321 and reloads it whenever a design changes.
